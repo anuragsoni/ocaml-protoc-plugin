@@ -38,8 +38,8 @@ module Make (T : T) = struct
     | Bool : bool spec
     | String : string spec
     | Bytes : bytes spec
-    | Enum : ('a, int -> 'a Result.t, 'a -> int) T.dir -> 'a spec
-    | Message : ('a, Reader.t -> 'a Result.t, 'a -> Writer.t) T.dir -> 'a spec
+    | Enum : ('a, int -> 'a, 'a -> int) T.dir -> 'a spec
+    | Message : ('a, Reader.t -> 'a, 'a -> Writer.t) T.dir -> 'a spec
 
   type _ oneof = Oneof_elem : int * 'b spec * ('a, 'b -> 'a, 'b) T.dir -> 'a oneof
 
@@ -86,7 +86,7 @@ module Make (T : T) = struct
     let some v = Some v
     let none = None
     let proto2 v = Proto2 v
-    let proto2_bytes v = Proto2 (Some (Bytes.of_string v))
+    let proto2_bytes v = Proto2 (Some (Bytes.unsafe_of_string v))
     let proto3 = Proto3
     let required = Required
     let repeated (i, s, p) = Repeated (i, s, p)

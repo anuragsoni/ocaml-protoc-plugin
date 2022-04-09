@@ -9,10 +9,7 @@ let%expect_test "Packed as string" =
   |> Ocaml_protoc_plugin.Writer.contents
   |> Ocaml_protoc_plugin.Reader.create
   |> T'.from_proto
-  |> function
-  | Ok t -> print_endline (T'.show t)
-  | Error e ->
-    Printf.printf "Failed to decode: %s\n" (Ocaml_protoc_plugin.Result.show_error e));
+  |> fun t -> print_endline (T'.show t));
   [%expect {|
     i: 5
     i: 6
@@ -31,10 +28,7 @@ let%expect_test "Packed as int" =
   |> Ocaml_protoc_plugin.Writer.contents
   |> Ocaml_protoc_plugin.Reader.create
   |> T'.from_proto
-  |> function
-  | Ok t -> print_endline (T'.show t)
-  | Error e ->
-    Printf.printf "Failed to decode: %s\n" (Ocaml_protoc_plugin.Result.show_error e));
+  |> fun t -> print_endline (T'.show t));
   [%expect {|
     i: 5
     i: 6

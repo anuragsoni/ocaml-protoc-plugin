@@ -9,7 +9,7 @@ let show : t -> string = Format.asprintf "%a" pp
 let equal _ _ = true
 let compare _ _ = 0
 
-let get : ('b -> 'b, 'b) Deserialize.S.compound_list -> t -> 'b Result.t =
+let get : ('b -> 'b, 'b) Deserialize.S.compound_list -> t -> 'b =
  fun spec t ->
   let writer = Writer.of_list t in
   (* Back and forth - its the same, no? *)
@@ -21,7 +21,7 @@ let set : ('a -> Writer.t, Writer.t) Serialize.S.compound_list -> t -> 'a -> t =
  fun spec t v ->
   let writer = Serialize.serialize [] spec [] v in
   let reader = Writer.contents writer |> Reader.create in
-  match Reader.to_list reader |> Result.get ~msg:"Internal serialization fail" with
+  match Reader.to_list reader with
   | (index, _) :: _ as fields -> List.filter ~f:(fun (i, _) -> i != index) t @ fields
   | [] -> t
 ;;

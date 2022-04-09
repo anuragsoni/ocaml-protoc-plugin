@@ -44,7 +44,7 @@ let emit_enum_type
   Code.append signature t;
   Code.append implementation t;
   Code.emit signature `None "val to_int: t -> int";
-  Code.emit signature `None "val from_int: int -> (t, [> Runtime'.Result.error]) result";
+  Code.emit signature `None "val from_int: int -> t";
   Code.emit implementation `Begin "let to_int = function";
   List.iter
     ~f:(fun EnumValueDescriptorProto.{ name; number; _ } ->
@@ -67,16 +67,11 @@ let emit_enum_type
         match IntSet.mem idx seen with
         | true -> seen
         | false ->
-          Code.emit
-            implementation
-            `None
-            "| %d -> Ok %s"
-            idx
-            (Scope.get_name_exn scope name);
+          Code.emit implementation `None "| %d -> %s" idx (Scope.get_name_exn scope name);
           IntSet.add idx seen)
       values
   in
-  Code.emit implementation `None "| n -> Error (`Unknown_enum_value n)";
+  Code.emit implementation `None "| n -> raise (Runtime'.Common.Unknown_enum_value n)";
   Code.emit implementation `End "";
   { module_name; signature; implementation }
 ;;
@@ -128,19 +123,13 @@ let emit_extension ~scope ~params field =
   let implementation = Code.init () in
   Code.append implementation signature;
   Code.emit signature `None "type t = %s %s" t.type' params.annot;
-  Code.emit
-    signature
-    `None
-    "val get: %s -> (%s, [> Runtime'.Result.error]) result"
-    extendee_type
-    t.type';
+  Code.emit signature `None "val get: %s -> %s" extendee_type t.type';
   Code.emit signature `None "val set: %s -> %s -> %s" extendee_type t.type' extendee_type;
   Code.emit implementation `None "type t = %s %s" t.type' params.annot;
   Code.emit
     implementation
     `None
-    "let get extendee = Runtime'.Extensions.get %s (extendee.%s) |> \
-     Runtime'.Result.open_error"
+    "let get extendee = Runtime'.Extensions.get %s (extendee.%s)"
     t.deserialize_spec
     extendee_field;
   Code.emit implementation `Begin "let set extendee t =";
@@ -269,10 +258,7 @@ let rec emit_message
       Code.emit signature `None "type t = %s %s" type' params.annot;
       Code.emit signature `None "val make : %s" default_constructor_sig;
       Code.emit signature `None "val to_proto: t -> Runtime'.Writer.t";
-      Code.emit
-        signature
-        `None
-        "val from_proto: Runtime'.Reader.t -> (t, [> Runtime'.Result.error]) result";
+      Code.emit signature `None "val from_proto: Runtime'.Reader.t -> t";
       Code.emit
         implementation
         `None
@@ -300,10 +286,7 @@ let rec emit_message
         `None
         "let deserialize = Runtime'.Deserialize.deserialize %s spec constructor in"
         extension_ranges;
-      Code.emit
-        implementation
-        `None
-        "fun writer -> deserialize writer |> Runtime'.Result.open_error";
+      Code.emit implementation `None "fun writer -> deserialize writer";
       Code.emit implementation `End ""
     | None -> ()
   in

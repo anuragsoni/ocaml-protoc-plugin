@@ -368,11 +368,9 @@ module Type_tree = struct
   let option_mangle_names FileDescriptorProto.{ options; _ } =
     Option.map ~f:Spec.Options.Ocaml_options.get options
     |> function
-    | Some (Ok (Some v)) -> v
-    | Some (Ok None) -> false
+    | Some (Some v) -> v
+    | Some None -> false
     | None -> false
-    | Some (Error _e) ->
-      failwith "Could not parse ocaml-protoc-plugin options with id 1074"
   ;;
 
   let create_db (files : FileDescriptorProto.t list) =

@@ -21,9 +21,6 @@ let read () =
   read_all stdin
   |> Ocaml_protoc_plugin.Reader.create
   |> Plugin.CodeGeneratorRequest.from_proto
-  |> function
-  | Ok v -> v
-  | Error _ -> failwith "Could not decode generator request"
 ;;
 
 (* Write to stdout *)
