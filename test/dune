@@ -1,38 +1,40 @@
 (library
  (name test)
- (enabled_if (and (<> %{architecture} x86_32) (<> %{architecture} arm32)))
- (libraries ocaml_protoc_plugin google_types )
+ (enabled_if
+  (and
+   (<> %{architecture} x86_32)
+   (<> %{architecture} arm32)))
+ (libraries ocaml_protoc_plugin google_types)
  (inline_tests)
  (preprocess
   (pps ppx_expect ppx_deriving.show ppx_deriving.eq)))
 
 (rule
  (targets google_include)
- (action (with-stdout-to %{targets}
-          (system "pkg-config protobuf --variable=includedir"))))
+ (action
+  (with-stdout-to
+   %{targets}
+   (system "pkg-config protobuf --variable=includedir"))))
 
 (rule
- (targets
-   basic.ml primitive_types.ml int_types.ml repeated.ml enum.ml
-   message.ml oneof.ml map.ml package.ml include.ml included.ml
-   included2.ml service.ml recursive.ml protocol.ml name_clash.ml
-   name_clash_mangle.ml proto2.ml packed.ml mangle_names.ml extensions.ml
-   options.ml name_clash2.ml empty.ml)
+ (targets basic.ml primitive_types.ml int_types.ml repeated.ml enum.ml
+   message.ml oneof.ml map.ml package.ml include.ml included.ml included2.ml
+   service.ml recursive.ml protocol.ml name_clash.ml name_clash_mangle.ml
+   proto2.ml packed.ml mangle_names.ml extensions.ml options.ml
+   name_clash2.ml empty.ml)
  (deps
   (:plugin ../src/plugin/protoc_gen_ocaml.exe)
-  (:proto
-    basic.proto primitive_types.proto int_types.proto repeated.proto
+  (:proto basic.proto primitive_types.proto int_types.proto repeated.proto
     enum.proto message.proto oneof.proto map.proto package.proto
     include.proto included.proto included2.proto service.proto
     recursive.proto protocol.proto name_clash.proto name_clash_mangle.proto
-    proto2.proto packed.proto mangle_names.proto extensions.proto options.proto
-    name_clash2.proto empty.proto
-  )
- )
+    proto2.proto packed.proto mangle_names.proto extensions.proto
+    options.proto name_clash2.proto empty.proto))
  (action
   (run protoc -I %{read-lines:google_include} -I .
-       "--plugin=protoc-gen-ocaml=%{plugin}"
-       "--ocaml_out=open=Google_types;annot=[@@deriving show { with_path = false }, eq]:." %{proto})))
+    "--plugin=protoc-gen-ocaml=%{plugin}"
+    "--ocaml_out=open=Google_types;annot=[@@deriving show { with_path = false }, eq]:."
+    %{proto})))
 
 (rule
  (targets int_types_native.ml int_types_native_proto2.ml)
@@ -41,8 +43,9 @@
   (:proto int_types_native.proto int_types_native_proto2.proto))
  (action
   (run protoc -I %{read-lines:google_include} -I .
-       "--plugin=protoc-gen-ocaml=%{plugin}"
-       "--ocaml_out=open=Google_types;int32_as_int=false;int64_as_int=false;annot=[@@deriving show { with_path = false }, eq]:." %{proto})))
+    "--plugin=protoc-gen-ocaml=%{plugin}"
+    "--ocaml_out=open=Google_types;int32_as_int=false;int64_as_int=false;annot=[@@deriving show { with_path = false }, eq]:."
+    %{proto})))
 
 (rule
  (targets singleton_record.ml oneof2.ml)
@@ -51,5 +54,6 @@
   (:proto singleton_record.proto oneof2.proto))
  (action
   (run protoc -I %{read-lines:google_include} -I .
-       "--plugin=protoc-gen-ocaml=%{plugin}"
-       "--ocaml_out=open=Google_types;annot=[@@deriving show { with_path = false }, eq]:." %{proto})))
+    "--plugin=protoc-gen-ocaml=%{plugin}"
+    "--ocaml_out=open=Google_types;annot=[@@deriving show { with_path = false }, eq]:."
+    %{proto})))

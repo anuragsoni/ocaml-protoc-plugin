@@ -1,17 +1,18 @@
 open StdLabels
 
-type t = {
-  mutable indent : string;
-  mutable code : string list;
-}
+type t =
+  { mutable indent : string
+  ; mutable code : string list
+  }
 
-let init () = {indent = ""; code = []}
+let init () = { indent = ""; code = [] }
 let incr t = t.indent <- "  " ^ t.indent
+
 let decr t =
   match String.length t.indent >= 2 with
-  | true ->
-    t.indent <- String.sub ~pos:0 ~len:(String.length t.indent - 2) t.indent
+  | true -> t.indent <- String.sub ~pos:0 ~len:(String.length t.indent - 2) t.indent
   | false -> failwith "Cannot decr indentation level at this point"
+;;
 
 let emit t indent fmt =
   let prepend s =
@@ -23,8 +24,7 @@ let emit t indent fmt =
     | `Begin ->
       prepend s;
       incr t
-    | `None ->
-      prepend s
+    | `None -> prepend s
     | `End ->
       decr t;
       prepend s
@@ -34,9 +34,10 @@ let emit t indent fmt =
       incr t
   in
   Printf.ksprintf emit fmt
+;;
 
 let append t code = List.iter ~f:(emit t `None "%s") (code.code |> List.rev)
 
 let contents t =
-  List.map ~f:(Printf.sprintf "%s") (List.rev t.code)
-  |> String.concat ~sep:"\n"
+  List.map ~f:(Printf.sprintf "%s") (List.rev t.code) |> String.concat ~sep:"\n"
+;;

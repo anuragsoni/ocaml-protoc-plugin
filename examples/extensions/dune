@@ -1,21 +1,22 @@
 (executable
- (name        test)
- (libraries   ocaml-protoc-plugin ocaml-protoc-plugin.google_types unix)
-)
+ (name test)
+ (libraries ocaml-protoc-plugin ocaml-protoc-plugin.google_types unix))
 
 (rule
  (targets google_include)
- (action (with-stdout-to %{targets}
-          (system "pkg-config protobuf --variable=includedir"))))
+ (action
+  (with-stdout-to
+   %{targets}
+   (system "pkg-config protobuf --variable=includedir"))))
 
 (rule
  (targets extensions.ml)
  (deps
-  (:proto extensions.proto) (package ocaml-protoc-plugin))
+  (:proto extensions.proto)
+  (package ocaml-protoc-plugin))
  (action
   (run protoc -I %{read-lines:google_include} -I . "--ocaml_out=:." %{proto})))
 
 (alias
  (name runtest)
- (deps test.exe)
-)
+ (deps test.exe))
