@@ -32,17 +32,7 @@ let handle_request proto_request =
   let decode, encode =
     Ocaml_protoc_plugin.Service.make_service_functions Echo.Echo.call
   in
-  let request =
-    Ocaml_protoc_plugin.Reader.create proto_request
-    |> decode
-    |> function
-    | Ok v -> v
-    | Error e ->
-      failwith
-        (Printf.sprintf
-           "Could not decode request: %s"
-           (Ocaml_protoc_plugin.Result.show_error e))
-  in
+  let request = Ocaml_protoc_plugin.Reader.create proto_request |> decode in
   let reply = mk_reply request in
   encode reply |> Ocaml_protoc_plugin.Writer.contents
 ;;
@@ -51,15 +41,7 @@ let do_request ~handler request =
   let encode, decode = Ocaml_protoc_plugin.Service.make_client_functions Echo.Echo.call in
   let proto_request = encode request |> Ocaml_protoc_plugin.Writer.contents in
   let proto_reply = handler proto_request in
-  Ocaml_protoc_plugin.Reader.create proto_reply
-  |> decode
-  |> function
-  | Ok v -> v
-  | Error e ->
-    failwith
-      (Printf.sprintf
-         "Could not reply request: %s"
-         (Ocaml_protoc_plugin.Result.show_error e))
+  Ocaml_protoc_plugin.Reader.create proto_reply |> decode
 ;;
 
 let () =

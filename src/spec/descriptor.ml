@@ -19,7 +19,7 @@ module Google = struct
 
       val make : ?file:FileDescriptorProto.t list -> unit -> t
       val to_proto : t -> Runtime'.Writer.t
-      val from_proto : Runtime'.Reader.t -> (t, [> Runtime'.Result.error ]) result
+      val from_proto : Runtime'.Reader.t -> t
     end = struct
       let name' () = "descriptor.google.protobuf.FileDescriptorSet"
 
@@ -53,7 +53,7 @@ module Google = struct
             ^:: nil)
         in
         let deserialize = Runtime'.Deserialize.deserialize [] spec constructor in
-        fun writer -> deserialize writer |> Runtime'.Result.open_error
+        fun writer -> deserialize writer
       ;;
     end
 
@@ -92,7 +92,7 @@ module Google = struct
         -> t
 
       val to_proto : t -> Runtime'.Writer.t
-      val from_proto : Runtime'.Reader.t -> (t, [> Runtime'.Result.error ]) result
+      val from_proto : Runtime'.Reader.t -> t
     end = struct
       let name' () = "descriptor.google.protobuf.FileDescriptorProto"
 
@@ -280,7 +280,7 @@ module Google = struct
             ^:: nil)
         in
         let deserialize = Runtime'.Deserialize.deserialize [] spec constructor in
-        fun writer -> deserialize writer |> Runtime'.Result.open_error
+        fun writer -> deserialize writer
       ;;
     end
 
@@ -302,7 +302,7 @@ module Google = struct
           -> t
 
         val to_proto : t -> Runtime'.Writer.t
-        val from_proto : Runtime'.Reader.t -> (t, [> Runtime'.Result.error ]) result
+        val from_proto : Runtime'.Reader.t -> t
       end
 
       and ReservedRange : sig
@@ -315,7 +315,7 @@ module Google = struct
 
         val make : ?start:int -> ?end':int -> unit -> t
         val to_proto : t -> Runtime'.Writer.t
-        val from_proto : Runtime'.Reader.t -> (t, [> Runtime'.Result.error ]) result
+        val from_proto : Runtime'.Reader.t -> t
       end
 
       val name' : unit -> string
@@ -348,7 +348,7 @@ module Google = struct
         -> t
 
       val to_proto : t -> Runtime'.Writer.t
-      val from_proto : Runtime'.Reader.t -> (t, [> Runtime'.Result.error ]) result
+      val from_proto : Runtime'.Reader.t -> t
     end = struct
       module rec ExtensionRange : sig
         val name' : unit -> string
@@ -367,7 +367,7 @@ module Google = struct
           -> t
 
         val to_proto : t -> Runtime'.Writer.t
-        val from_proto : Runtime'.Reader.t -> (t, [> Runtime'.Result.error ]) result
+        val from_proto : Runtime'.Reader.t -> t
       end = struct
         let name' () = "descriptor.google.protobuf.DescriptorProto.ExtensionRange"
 
@@ -402,7 +402,7 @@ module Google = struct
               ^:: nil)
           in
           let deserialize = Runtime'.Deserialize.deserialize [] spec constructor in
-          fun writer -> deserialize writer |> Runtime'.Result.open_error
+          fun writer -> deserialize writer
         ;;
       end
 
@@ -416,7 +416,7 @@ module Google = struct
 
         val make : ?start:int -> ?end':int -> unit -> t
         val to_proto : t -> Runtime'.Writer.t
-        val from_proto : Runtime'.Reader.t -> (t, [> Runtime'.Result.error ]) result
+        val from_proto : Runtime'.Reader.t -> t
       end = struct
         let name' () = "descriptor.google.protobuf.DescriptorProto.ReservedRange"
 
@@ -444,7 +444,7 @@ module Google = struct
               basic_opt (1, int32_int) ^:: basic_opt (2, int32_int) ^:: nil)
           in
           let deserialize = Runtime'.Deserialize.deserialize [] spec constructor in
-          fun writer -> deserialize writer |> Runtime'.Result.open_error
+          fun writer -> deserialize writer
         ;;
       end
 
@@ -635,7 +635,7 @@ module Google = struct
             ^:: nil)
         in
         let deserialize = Runtime'.Deserialize.deserialize [] spec constructor in
-        fun writer -> deserialize writer |> Runtime'.Result.open_error
+        fun writer -> deserialize writer
       ;;
     end
 
@@ -654,7 +654,7 @@ module Google = struct
         -> t
 
       val to_proto : t -> Runtime'.Writer.t
-      val from_proto : Runtime'.Reader.t -> (t, [> Runtime'.Result.error ]) result
+      val from_proto : Runtime'.Reader.t -> t
     end = struct
       let name' () = "descriptor.google.protobuf.ExtensionRangeOptions"
 
@@ -697,7 +697,7 @@ module Google = struct
         let deserialize =
           Runtime'.Deserialize.deserialize [ 1000, 536870912 ] spec constructor
         in
-        fun writer -> deserialize writer |> Runtime'.Result.open_error
+        fun writer -> deserialize writer
       ;;
     end
 
@@ -724,7 +724,7 @@ module Google = struct
           | TYPE_SINT64
 
         val to_int : t -> int
-        val from_int : int -> (t, [> Runtime'.Result.error ]) result
+        val from_int : int -> t
       end
 
       and Label : sig
@@ -734,7 +734,7 @@ module Google = struct
           | LABEL_REPEATED
 
         val to_int : t -> int
-        val from_int : int -> (t, [> Runtime'.Result.error ]) result
+        val from_int : int -> t
       end
 
       val name' : unit -> string
@@ -769,7 +769,7 @@ module Google = struct
         -> t
 
       val to_proto : t -> Runtime'.Writer.t
-      val from_proto : Runtime'.Reader.t -> (t, [> Runtime'.Result.error ]) result
+      val from_proto : Runtime'.Reader.t -> t
     end = struct
       module rec Type : sig
         type t =
@@ -793,7 +793,7 @@ module Google = struct
           | TYPE_SINT64
 
         val to_int : t -> int
-        val from_int : int -> (t, [> Runtime'.Result.error ]) result
+        val from_int : int -> t
       end = struct
         type t =
           | TYPE_DOUBLE
@@ -837,25 +837,25 @@ module Google = struct
         ;;
 
         let from_int = function
-          | 1 -> Ok TYPE_DOUBLE
-          | 2 -> Ok TYPE_FLOAT
-          | 3 -> Ok TYPE_INT64
-          | 4 -> Ok TYPE_UINT64
-          | 5 -> Ok TYPE_INT32
-          | 6 -> Ok TYPE_FIXED64
-          | 7 -> Ok TYPE_FIXED32
-          | 8 -> Ok TYPE_BOOL
-          | 9 -> Ok TYPE_STRING
-          | 10 -> Ok TYPE_GROUP
-          | 11 -> Ok TYPE_MESSAGE
-          | 12 -> Ok TYPE_BYTES
-          | 13 -> Ok TYPE_UINT32
-          | 14 -> Ok TYPE_ENUM
-          | 15 -> Ok TYPE_SFIXED32
-          | 16 -> Ok TYPE_SFIXED64
-          | 17 -> Ok TYPE_SINT32
-          | 18 -> Ok TYPE_SINT64
-          | n -> Error (`Unknown_enum_value n)
+          | 1 -> TYPE_DOUBLE
+          | 2 -> TYPE_FLOAT
+          | 3 -> TYPE_INT64
+          | 4 -> TYPE_UINT64
+          | 5 -> TYPE_INT32
+          | 6 -> TYPE_FIXED64
+          | 7 -> TYPE_FIXED32
+          | 8 -> TYPE_BOOL
+          | 9 -> TYPE_STRING
+          | 10 -> TYPE_GROUP
+          | 11 -> TYPE_MESSAGE
+          | 12 -> TYPE_BYTES
+          | 13 -> TYPE_UINT32
+          | 14 -> TYPE_ENUM
+          | 15 -> TYPE_SFIXED32
+          | 16 -> TYPE_SFIXED64
+          | 17 -> TYPE_SINT32
+          | 18 -> TYPE_SINT64
+          | n -> raise (Runtime'.Common.Unknown_enum_value n)
         ;;
       end
 
@@ -866,7 +866,7 @@ module Google = struct
           | LABEL_REPEATED
 
         val to_int : t -> int
-        val from_int : int -> (t, [> Runtime'.Result.error ]) result
+        val from_int : int -> t
       end = struct
         type t =
           | LABEL_OPTIONAL
@@ -880,10 +880,10 @@ module Google = struct
         ;;
 
         let from_int = function
-          | 1 -> Ok LABEL_OPTIONAL
-          | 2 -> Ok LABEL_REQUIRED
-          | 3 -> Ok LABEL_REPEATED
-          | n -> Error (`Unknown_enum_value n)
+          | 1 -> LABEL_OPTIONAL
+          | 2 -> LABEL_REQUIRED
+          | 3 -> LABEL_REPEATED
+          | n -> raise (Runtime'.Common.Unknown_enum_value n)
         ;;
       end
 
@@ -1024,7 +1024,7 @@ module Google = struct
             ^:: nil)
         in
         let deserialize = Runtime'.Deserialize.deserialize [] spec constructor in
-        fun writer -> deserialize writer |> Runtime'.Result.open_error
+        fun writer -> deserialize writer
       ;;
     end
 
@@ -1038,7 +1038,7 @@ module Google = struct
 
       val make : ?name:string -> ?options:OneofOptions.t -> unit -> t
       val to_proto : t -> Runtime'.Writer.t
-      val from_proto : Runtime'.Reader.t -> (t, [> Runtime'.Result.error ]) result
+      val from_proto : Runtime'.Reader.t -> t
     end = struct
       let name' () = "descriptor.google.protobuf.OneofDescriptorProto"
 
@@ -1070,7 +1070,7 @@ module Google = struct
             ^:: nil)
         in
         let deserialize = Runtime'.Deserialize.deserialize [] spec constructor in
-        fun writer -> deserialize writer |> Runtime'.Result.open_error
+        fun writer -> deserialize writer
       ;;
     end
 
@@ -1085,7 +1085,7 @@ module Google = struct
 
         val make : ?start:int -> ?end':int -> unit -> t
         val to_proto : t -> Runtime'.Writer.t
-        val from_proto : Runtime'.Reader.t -> (t, [> Runtime'.Result.error ]) result
+        val from_proto : Runtime'.Reader.t -> t
       end
 
       val name' : unit -> string
@@ -1108,7 +1108,7 @@ module Google = struct
         -> t
 
       val to_proto : t -> Runtime'.Writer.t
-      val from_proto : Runtime'.Reader.t -> (t, [> Runtime'.Result.error ]) result
+      val from_proto : Runtime'.Reader.t -> t
     end = struct
       module rec EnumReservedRange : sig
         val name' : unit -> string
@@ -1120,7 +1120,7 @@ module Google = struct
 
         val make : ?start:int -> ?end':int -> unit -> t
         val to_proto : t -> Runtime'.Writer.t
-        val from_proto : Runtime'.Reader.t -> (t, [> Runtime'.Result.error ]) result
+        val from_proto : Runtime'.Reader.t -> t
       end = struct
         let name' () = "descriptor.google.protobuf.EnumDescriptorProto.EnumReservedRange"
 
@@ -1148,7 +1148,7 @@ module Google = struct
               basic_opt (1, int32_int) ^:: basic_opt (2, int32_int) ^:: nil)
           in
           let deserialize = Runtime'.Deserialize.deserialize [] spec constructor in
-          fun writer -> deserialize writer |> Runtime'.Result.open_error
+          fun writer -> deserialize writer
         ;;
       end
 
@@ -1220,7 +1220,7 @@ module Google = struct
             ^:: nil)
         in
         let deserialize = Runtime'.Deserialize.deserialize [] spec constructor in
-        fun writer -> deserialize writer |> Runtime'.Result.open_error
+        fun writer -> deserialize writer
       ;;
     end
 
@@ -1235,7 +1235,7 @@ module Google = struct
 
       val make : ?name:string -> ?number:int -> ?options:EnumValueOptions.t -> unit -> t
       val to_proto : t -> Runtime'.Writer.t
-      val from_proto : Runtime'.Reader.t -> (t, [> Runtime'.Result.error ]) result
+      val from_proto : Runtime'.Reader.t -> t
     end = struct
       let name' () = "descriptor.google.protobuf.EnumValueDescriptorProto"
 
@@ -1270,7 +1270,7 @@ module Google = struct
             ^:: nil)
         in
         let deserialize = Runtime'.Deserialize.deserialize [] spec constructor in
-        fun writer -> deserialize writer |> Runtime'.Result.open_error
+        fun writer -> deserialize writer
       ;;
     end
 
@@ -1291,7 +1291,7 @@ module Google = struct
         -> t
 
       val to_proto : t -> Runtime'.Writer.t
-      val from_proto : Runtime'.Reader.t -> (t, [> Runtime'.Result.error ]) result
+      val from_proto : Runtime'.Reader.t -> t
     end = struct
       let name' () = "descriptor.google.protobuf.ServiceDescriptorProto"
 
@@ -1335,7 +1335,7 @@ module Google = struct
             ^:: nil)
         in
         let deserialize = Runtime'.Deserialize.deserialize [] spec constructor in
-        fun writer -> deserialize writer |> Runtime'.Result.open_error
+        fun writer -> deserialize writer
       ;;
     end
 
@@ -1362,7 +1362,7 @@ module Google = struct
         -> t
 
       val to_proto : t -> Runtime'.Writer.t
-      val from_proto : Runtime'.Reader.t -> (t, [> Runtime'.Result.error ]) result
+      val from_proto : Runtime'.Reader.t -> t
     end = struct
       let name' () = "descriptor.google.protobuf.MethodDescriptorProto"
 
@@ -1441,7 +1441,7 @@ module Google = struct
             ^:: nil)
         in
         let deserialize = Runtime'.Deserialize.deserialize [] spec constructor in
-        fun writer -> deserialize writer |> Runtime'.Result.open_error
+        fun writer -> deserialize writer
       ;;
     end
 
@@ -1453,7 +1453,7 @@ module Google = struct
           | LITE_RUNTIME
 
         val to_int : t -> int
-        val from_int : int -> (t, [> Runtime'.Result.error ]) result
+        val from_int : int -> t
       end
 
       val name' : unit -> string
@@ -1510,7 +1510,7 @@ module Google = struct
         -> t
 
       val to_proto : t -> Runtime'.Writer.t
-      val from_proto : Runtime'.Reader.t -> (t, [> Runtime'.Result.error ]) result
+      val from_proto : Runtime'.Reader.t -> t
     end = struct
       module rec OptimizeMode : sig
         type t =
@@ -1519,7 +1519,7 @@ module Google = struct
           | LITE_RUNTIME
 
         val to_int : t -> int
-        val from_int : int -> (t, [> Runtime'.Result.error ]) result
+        val from_int : int -> t
       end = struct
         type t =
           | SPEED
@@ -1533,10 +1533,10 @@ module Google = struct
         ;;
 
         let from_int = function
-          | 1 -> Ok SPEED
-          | 2 -> Ok CODE_SIZE
-          | 3 -> Ok LITE_RUNTIME
-          | n -> Error (`Unknown_enum_value n)
+          | 1 -> SPEED
+          | 2 -> CODE_SIZE
+          | 3 -> LITE_RUNTIME
+          | n -> raise (Runtime'.Common.Unknown_enum_value n)
         ;;
       end
 
@@ -1832,7 +1832,7 @@ module Google = struct
         let deserialize =
           Runtime'.Deserialize.deserialize [ 1000, 536870912 ] spec constructor
         in
-        fun writer -> deserialize writer |> Runtime'.Result.open_error
+        fun writer -> deserialize writer
       ;;
     end
 
@@ -1859,7 +1859,7 @@ module Google = struct
         -> t
 
       val to_proto : t -> Runtime'.Writer.t
-      val from_proto : Runtime'.Reader.t -> (t, [> Runtime'.Result.error ]) result
+      val from_proto : Runtime'.Reader.t -> t
     end = struct
       let name' () = "descriptor.google.protobuf.MessageOptions"
 
@@ -1973,7 +1973,7 @@ module Google = struct
         let deserialize =
           Runtime'.Deserialize.deserialize [ 1000, 536870912 ] spec constructor
         in
-        fun writer -> deserialize writer |> Runtime'.Result.open_error
+        fun writer -> deserialize writer
       ;;
     end
 
@@ -1985,7 +1985,7 @@ module Google = struct
           | STRING_PIECE
 
         val to_int : t -> int
-        val from_int : int -> (t, [> Runtime'.Result.error ]) result
+        val from_int : int -> t
       end
 
       and JSType : sig
@@ -1995,7 +1995,7 @@ module Google = struct
           | JS_NUMBER
 
         val to_int : t -> int
-        val from_int : int -> (t, [> Runtime'.Result.error ]) result
+        val from_int : int -> t
       end
 
       val name' : unit -> string
@@ -2024,7 +2024,7 @@ module Google = struct
         -> t
 
       val to_proto : t -> Runtime'.Writer.t
-      val from_proto : Runtime'.Reader.t -> (t, [> Runtime'.Result.error ]) result
+      val from_proto : Runtime'.Reader.t -> t
     end = struct
       module rec CType : sig
         type t =
@@ -2033,7 +2033,7 @@ module Google = struct
           | STRING_PIECE
 
         val to_int : t -> int
-        val from_int : int -> (t, [> Runtime'.Result.error ]) result
+        val from_int : int -> t
       end = struct
         type t =
           | STRING
@@ -2047,10 +2047,10 @@ module Google = struct
         ;;
 
         let from_int = function
-          | 0 -> Ok STRING
-          | 1 -> Ok CORD
-          | 2 -> Ok STRING_PIECE
-          | n -> Error (`Unknown_enum_value n)
+          | 0 -> STRING
+          | 1 -> CORD
+          | 2 -> STRING_PIECE
+          | n -> raise (Runtime'.Common.Unknown_enum_value n)
         ;;
       end
 
@@ -2061,7 +2061,7 @@ module Google = struct
           | JS_NUMBER
 
         val to_int : t -> int
-        val from_int : int -> (t, [> Runtime'.Result.error ]) result
+        val from_int : int -> t
       end = struct
         type t =
           | JS_NORMAL
@@ -2075,10 +2075,10 @@ module Google = struct
         ;;
 
         let from_int = function
-          | 0 -> Ok JS_NORMAL
-          | 1 -> Ok JS_STRING
-          | 2 -> Ok JS_NUMBER
-          | n -> Error (`Unknown_enum_value n)
+          | 0 -> JS_NORMAL
+          | 1 -> JS_STRING
+          | 2 -> JS_NUMBER
+          | n -> raise (Runtime'.Common.Unknown_enum_value n)
         ;;
       end
 
@@ -2220,7 +2220,7 @@ module Google = struct
         let deserialize =
           Runtime'.Deserialize.deserialize [ 1000, 536870912 ] spec constructor
         in
-        fun writer -> deserialize writer |> Runtime'.Result.open_error
+        fun writer -> deserialize writer
       ;;
     end
 
@@ -2239,7 +2239,7 @@ module Google = struct
         -> t
 
       val to_proto : t -> Runtime'.Writer.t
-      val from_proto : Runtime'.Reader.t -> (t, [> Runtime'.Result.error ]) result
+      val from_proto : Runtime'.Reader.t -> t
     end = struct
       let name' () = "descriptor.google.protobuf.OneofOptions"
 
@@ -2282,7 +2282,7 @@ module Google = struct
         let deserialize =
           Runtime'.Deserialize.deserialize [ 1000, 536870912 ] spec constructor
         in
-        fun writer -> deserialize writer |> Runtime'.Result.open_error
+        fun writer -> deserialize writer
       ;;
     end
 
@@ -2305,7 +2305,7 @@ module Google = struct
         -> t
 
       val to_proto : t -> Runtime'.Writer.t
-      val from_proto : Runtime'.Reader.t -> (t, [> Runtime'.Result.error ]) result
+      val from_proto : Runtime'.Reader.t -> t
     end = struct
       let name' () = "descriptor.google.protobuf.EnumOptions"
 
@@ -2367,7 +2367,7 @@ module Google = struct
         let deserialize =
           Runtime'.Deserialize.deserialize [ 1000, 536870912 ] spec constructor
         in
-        fun writer -> deserialize writer |> Runtime'.Result.open_error
+        fun writer -> deserialize writer
       ;;
     end
 
@@ -2388,7 +2388,7 @@ module Google = struct
         -> t
 
       val to_proto : t -> Runtime'.Writer.t
-      val from_proto : Runtime'.Reader.t -> (t, [> Runtime'.Result.error ]) result
+      val from_proto : Runtime'.Reader.t -> t
     end = struct
       let name' () = "descriptor.google.protobuf.EnumValueOptions"
 
@@ -2446,7 +2446,7 @@ module Google = struct
         let deserialize =
           Runtime'.Deserialize.deserialize [ 1000, 536870912 ] spec constructor
         in
-        fun writer -> deserialize writer |> Runtime'.Result.open_error
+        fun writer -> deserialize writer
       ;;
     end
 
@@ -2467,7 +2467,7 @@ module Google = struct
         -> t
 
       val to_proto : t -> Runtime'.Writer.t
-      val from_proto : Runtime'.Reader.t -> (t, [> Runtime'.Result.error ]) result
+      val from_proto : Runtime'.Reader.t -> t
     end = struct
       let name' () = "descriptor.google.protobuf.ServiceOptions"
 
@@ -2525,7 +2525,7 @@ module Google = struct
         let deserialize =
           Runtime'.Deserialize.deserialize [ 1000, 536870912 ] spec constructor
         in
-        fun writer -> deserialize writer |> Runtime'.Result.open_error
+        fun writer -> deserialize writer
       ;;
     end
 
@@ -2537,7 +2537,7 @@ module Google = struct
           | IDEMPOTENT
 
         val to_int : t -> int
-        val from_int : int -> (t, [> Runtime'.Result.error ]) result
+        val from_int : int -> t
       end
 
       val name' : unit -> string
@@ -2558,7 +2558,7 @@ module Google = struct
         -> t
 
       val to_proto : t -> Runtime'.Writer.t
-      val from_proto : Runtime'.Reader.t -> (t, [> Runtime'.Result.error ]) result
+      val from_proto : Runtime'.Reader.t -> t
     end = struct
       module rec IdempotencyLevel : sig
         type t =
@@ -2567,7 +2567,7 @@ module Google = struct
           | IDEMPOTENT
 
         val to_int : t -> int
-        val from_int : int -> (t, [> Runtime'.Result.error ]) result
+        val from_int : int -> t
       end = struct
         type t =
           | IDEMPOTENCY_UNKNOWN
@@ -2581,10 +2581,10 @@ module Google = struct
         ;;
 
         let from_int = function
-          | 0 -> Ok IDEMPOTENCY_UNKNOWN
-          | 1 -> Ok NO_SIDE_EFFECTS
-          | 2 -> Ok IDEMPOTENT
-          | n -> Error (`Unknown_enum_value n)
+          | 0 -> IDEMPOTENCY_UNKNOWN
+          | 1 -> NO_SIDE_EFFECTS
+          | 2 -> IDEMPOTENT
+          | n -> raise (Runtime'.Common.Unknown_enum_value n)
         ;;
       end
 
@@ -2662,7 +2662,7 @@ module Google = struct
         let deserialize =
           Runtime'.Deserialize.deserialize [ 1000, 536870912 ] spec constructor
         in
-        fun writer -> deserialize writer |> Runtime'.Result.open_error
+        fun writer -> deserialize writer
       ;;
     end
 
@@ -2677,7 +2677,7 @@ module Google = struct
 
         val make : name_part:string -> is_extension:bool -> unit -> t
         val to_proto : t -> Runtime'.Writer.t
-        val from_proto : Runtime'.Reader.t -> (t, [> Runtime'.Result.error ]) result
+        val from_proto : Runtime'.Reader.t -> t
       end
 
       val name' : unit -> string
@@ -2704,7 +2704,7 @@ module Google = struct
         -> t
 
       val to_proto : t -> Runtime'.Writer.t
-      val from_proto : Runtime'.Reader.t -> (t, [> Runtime'.Result.error ]) result
+      val from_proto : Runtime'.Reader.t -> t
     end = struct
       module rec NamePart : sig
         val name' : unit -> string
@@ -2716,7 +2716,7 @@ module Google = struct
 
         val make : name_part:string -> is_extension:bool -> unit -> t
         val to_proto : t -> Runtime'.Writer.t
-        val from_proto : Runtime'.Reader.t -> (t, [> Runtime'.Result.error ]) result
+        val from_proto : Runtime'.Reader.t -> t
       end = struct
         let name' () = "descriptor.google.protobuf.UninterpretedOption.NamePart"
 
@@ -2746,7 +2746,7 @@ module Google = struct
               basic (1, string, required) ^:: basic (2, bool, required) ^:: nil)
           in
           let deserialize = Runtime'.Deserialize.deserialize [] spec constructor in
-          fun writer -> deserialize writer |> Runtime'.Result.open_error
+          fun writer -> deserialize writer
         ;;
       end
 
@@ -2858,7 +2858,7 @@ module Google = struct
             ^:: nil)
         in
         let deserialize = Runtime'.Deserialize.deserialize [] spec constructor in
-        fun writer -> deserialize writer |> Runtime'.Result.open_error
+        fun writer -> deserialize writer
       ;;
     end
 
@@ -2884,7 +2884,7 @@ module Google = struct
           -> t
 
         val to_proto : t -> Runtime'.Writer.t
-        val from_proto : Runtime'.Reader.t -> (t, [> Runtime'.Result.error ]) result
+        val from_proto : Runtime'.Reader.t -> t
       end
 
       val name' : unit -> string
@@ -2893,7 +2893,7 @@ module Google = struct
 
       val make : ?location:SourceCodeInfo.Location.t list -> unit -> t
       val to_proto : t -> Runtime'.Writer.t
-      val from_proto : Runtime'.Reader.t -> (t, [> Runtime'.Result.error ]) result
+      val from_proto : Runtime'.Reader.t -> t
     end = struct
       module rec Location : sig
         val name' : unit -> string
@@ -2916,7 +2916,7 @@ module Google = struct
           -> t
 
         val to_proto : t -> Runtime'.Writer.t
-        val from_proto : Runtime'.Reader.t -> (t, [> Runtime'.Result.error ]) result
+        val from_proto : Runtime'.Reader.t -> t
       end = struct
         let name' () = "descriptor.google.protobuf.SourceCodeInfo.Location"
 
@@ -2995,7 +2995,7 @@ module Google = struct
               ^:: nil)
           in
           let deserialize = Runtime'.Deserialize.deserialize [] spec constructor in
-          fun writer -> deserialize writer |> Runtime'.Result.open_error
+          fun writer -> deserialize writer
         ;;
       end
 
@@ -3032,7 +3032,7 @@ module Google = struct
             ^:: nil)
         in
         let deserialize = Runtime'.Deserialize.deserialize [] spec constructor in
-        fun writer -> deserialize writer |> Runtime'.Result.open_error
+        fun writer -> deserialize writer
       ;;
     end
 
@@ -3056,7 +3056,7 @@ module Google = struct
           -> t
 
         val to_proto : t -> Runtime'.Writer.t
-        val from_proto : Runtime'.Reader.t -> (t, [> Runtime'.Result.error ]) result
+        val from_proto : Runtime'.Reader.t -> t
       end
 
       val name' : unit -> string
@@ -3065,7 +3065,7 @@ module Google = struct
 
       val make : ?annotation:GeneratedCodeInfo.Annotation.t list -> unit -> t
       val to_proto : t -> Runtime'.Writer.t
-      val from_proto : Runtime'.Reader.t -> (t, [> Runtime'.Result.error ]) result
+      val from_proto : Runtime'.Reader.t -> t
     end = struct
       module rec Annotation : sig
         val name' : unit -> string
@@ -3086,7 +3086,7 @@ module Google = struct
           -> t
 
         val to_proto : t -> Runtime'.Writer.t
-        val from_proto : Runtime'.Reader.t -> (t, [> Runtime'.Result.error ]) result
+        val from_proto : Runtime'.Reader.t -> t
       end = struct
         let name' () = "descriptor.google.protobuf.GeneratedCodeInfo.Annotation"
 
@@ -3135,7 +3135,7 @@ module Google = struct
               ^:: nil)
           in
           let deserialize = Runtime'.Deserialize.deserialize [] spec constructor in
-          fun writer -> deserialize writer |> Runtime'.Result.open_error
+          fun writer -> deserialize writer
         ;;
       end
 
@@ -3173,7 +3173,7 @@ module Google = struct
             ^:: nil)
         in
         let deserialize = Runtime'.Deserialize.deserialize [] spec constructor in
-        fun writer -> deserialize writer |> Runtime'.Result.open_error
+        fun writer -> deserialize writer
       ;;
     end
   end

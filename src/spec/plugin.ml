@@ -33,7 +33,7 @@ module Google = struct
 
         val make : ?major:int -> ?minor:int -> ?patch:int -> ?suffix:string -> unit -> t
         val to_proto : t -> Runtime'.Writer.t
-        val from_proto : Runtime'.Reader.t -> (t, [> Runtime'.Result.error ]) result
+        val from_proto : Runtime'.Reader.t -> t
       end = struct
         let name' () = "plugin.google.protobuf.compiler.Version"
 
@@ -75,7 +75,7 @@ module Google = struct
               ^:: nil)
           in
           let deserialize = Runtime'.Deserialize.deserialize [] spec constructor in
-          fun writer -> deserialize writer |> Runtime'.Result.open_error
+          fun writer -> deserialize writer
         ;;
       end
 
@@ -100,7 +100,7 @@ module Google = struct
           -> t
 
         val to_proto : t -> Runtime'.Writer.t
-        val from_proto : Runtime'.Reader.t -> (t, [> Runtime'.Result.error ]) result
+        val from_proto : Runtime'.Reader.t -> t
       end = struct
         let name' () = "plugin.google.protobuf.compiler.CodeGeneratorRequest"
 
@@ -173,7 +173,7 @@ module Google = struct
               ^:: nil)
           in
           let deserialize = Runtime'.Deserialize.deserialize [] spec constructor in
-          fun writer -> deserialize writer |> Runtime'.Result.open_error
+          fun writer -> deserialize writer
         ;;
       end
 
@@ -184,7 +184,7 @@ module Google = struct
             | FEATURE_PROTO3_OPTIONAL
 
           val to_int : t -> int
-          val from_int : int -> (t, [> Runtime'.Result.error ]) result
+          val from_int : int -> t
         end
 
         and File : sig
@@ -194,17 +194,21 @@ module Google = struct
             { name : string option
             ; insertion_point : string option
             ; content : string option
+            ; generated_code_info :
+                Imported'modules.Descriptor.Google.Protobuf.GeneratedCodeInfo.t option
             }
 
           val make
             :  ?name:string
             -> ?insertion_point:string
             -> ?content:string
+            -> ?generated_code_info:
+                 Imported'modules.Descriptor.Google.Protobuf.GeneratedCodeInfo.t
             -> unit
             -> t
 
           val to_proto : t -> Runtime'.Writer.t
-          val from_proto : Runtime'.Reader.t -> (t, [> Runtime'.Result.error ]) result
+          val from_proto : Runtime'.Reader.t -> t
         end
 
         val name' : unit -> string
@@ -223,7 +227,7 @@ module Google = struct
           -> t
 
         val to_proto : t -> Runtime'.Writer.t
-        val from_proto : Runtime'.Reader.t -> (t, [> Runtime'.Result.error ]) result
+        val from_proto : Runtime'.Reader.t -> t
       end = struct
         module rec Feature : sig
           type t =
@@ -231,7 +235,7 @@ module Google = struct
             | FEATURE_PROTO3_OPTIONAL
 
           val to_int : t -> int
-          val from_int : int -> (t, [> Runtime'.Result.error ]) result
+          val from_int : int -> t
         end = struct
           type t =
             | FEATURE_NONE
@@ -243,9 +247,9 @@ module Google = struct
           ;;
 
           let from_int = function
-            | 0 -> Ok FEATURE_NONE
-            | 1 -> Ok FEATURE_PROTO3_OPTIONAL
-            | n -> Error (`Unknown_enum_value n)
+            | 0 -> FEATURE_NONE
+            | 1 -> FEATURE_PROTO3_OPTIONAL
+            | n -> raise (Runtime'.Common.Unknown_enum_value n)
           ;;
         end
 
@@ -256,17 +260,21 @@ module Google = struct
             { name : string option
             ; insertion_point : string option
             ; content : string option
+            ; generated_code_info :
+                Imported'modules.Descriptor.Google.Protobuf.GeneratedCodeInfo.t option
             }
 
           val make
             :  ?name:string
             -> ?insertion_point:string
             -> ?content:string
+            -> ?generated_code_info:
+                 Imported'modules.Descriptor.Google.Protobuf.GeneratedCodeInfo.t
             -> unit
             -> t
 
           val to_proto : t -> Runtime'.Writer.t
-          val from_proto : Runtime'.Reader.t -> (t, [> Runtime'.Result.error ]) result
+          val from_proto : Runtime'.Reader.t -> t
         end = struct
           let name' () = "plugin.google.protobuf.compiler.CodeGeneratorResponse.File"
 
@@ -274,19 +282,29 @@ module Google = struct
             { name : string option
             ; insertion_point : string option
             ; content : string option
+            ; generated_code_info :
+                Imported'modules.Descriptor.Google.Protobuf.GeneratedCodeInfo.t option
             }
 
-          let make ?name ?insertion_point ?content () = { name; insertion_point; content }
+          let make ?name ?insertion_point ?content ?generated_code_info () =
+            { name; insertion_point; content; generated_code_info }
+          ;;
 
           let to_proto =
-            let apply ~f:f' { name; insertion_point; content } =
-              f' [] name insertion_point content
+            let apply ~f:f' { name; insertion_point; content; generated_code_info } =
+              f' [] name insertion_point content generated_code_info
             in
             let spec =
               Runtime'.Serialize.C.(
                 basic_opt (1, string)
                 ^:: basic_opt (2, string)
                 ^:: basic_opt (15, string)
+                ^:: basic_opt
+                      ( 16
+                      , message (fun t ->
+                          Imported'modules.Descriptor.Google.Protobuf.GeneratedCodeInfo
+                          .to_proto
+                            t) )
                 ^:: nil)
             in
             let serialize = Runtime'.Serialize.serialize [] spec in
@@ -294,18 +312,24 @@ module Google = struct
           ;;
 
           let from_proto =
-            let constructor _extensions name insertion_point content =
-              { name; insertion_point; content }
+            let constructor _extensions name insertion_point content generated_code_info =
+              { name; insertion_point; content; generated_code_info }
             in
             let spec =
               Runtime'.Deserialize.C.(
                 basic_opt (1, string)
                 ^:: basic_opt (2, string)
                 ^:: basic_opt (15, string)
+                ^:: basic_opt
+                      ( 16
+                      , message (fun t ->
+                          Imported'modules.Descriptor.Google.Protobuf.GeneratedCodeInfo
+                          .from_proto
+                            t) )
                 ^:: nil)
             in
             let deserialize = Runtime'.Deserialize.deserialize [] spec constructor in
-            fun writer -> deserialize writer |> Runtime'.Result.open_error
+            fun writer -> deserialize writer
           ;;
         end
 
@@ -359,7 +383,7 @@ module Google = struct
               ^:: nil)
           in
           let deserialize = Runtime'.Deserialize.deserialize [] spec constructor in
-          fun writer -> deserialize writer |> Runtime'.Result.open_error
+          fun writer -> deserialize writer
         ;;
       end
     end

@@ -24,7 +24,7 @@ module rec Options : sig
 
   val make : ?mangle_names:bool -> unit -> t
   val to_proto : t -> Runtime'.Writer.t
-  val from_proto : Runtime'.Reader.t -> (t, [> Runtime'.Result.error ]) result
+  val from_proto : Runtime'.Reader.t -> t
 end = struct
   let name' () = "options.Options"
 
@@ -50,16 +50,14 @@ end = struct
     let constructor _extensions mangle_names = mangle_names in
     let spec = Runtime'.Deserialize.C.(basic (1, bool, proto3) ^:: nil) in
     let deserialize = Runtime'.Deserialize.deserialize [] spec constructor in
-    fun writer -> deserialize writer |> Runtime'.Result.open_error
+    fun writer -> deserialize writer
   ;;
 end
 
 and Ocaml_options : sig
   type t = Options.t option
 
-  val get
-    :  Imported'modules.Descriptor.Google.Protobuf.FileOptions.t
-    -> (Options.t option, [> Runtime'.Result.error ]) result
+  val get : Imported'modules.Descriptor.Google.Protobuf.FileOptions.t -> Options.t option
 
   val set
     :  Imported'modules.Descriptor.Google.Protobuf.FileOptions.t
@@ -73,7 +71,6 @@ end = struct
       Runtime'.Deserialize.C.(
         basic_opt (1074, message (fun t -> Options.from_proto t)) ^:: nil)
       extendee.Imported'modules.Descriptor.Google.Protobuf.FileOptions.extensions'
-    |> Runtime'.Result.open_error
   ;;
 
   let set extendee t =

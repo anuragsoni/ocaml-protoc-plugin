@@ -4,7 +4,7 @@ module type T = sig
   type t [@@deriving show, eq]
 
   val to_proto : t -> Ocaml_protoc_plugin.Writer.t
-  val from_proto : Ocaml_protoc_plugin.Reader.t -> t Ocaml_protoc_plugin.Result.t
+  val from_proto : Ocaml_protoc_plugin.Reader.t -> t
   val name' : unit -> string
 end
 
@@ -68,12 +68,10 @@ let test_encode
   (* Decode the message *)
   let in_data = Ocaml_protoc_plugin.Reader.create data in
   match M.from_proto in_data with
-  | Ok observed when M.equal expect observed -> ()
-  | Ok observed ->
+  | observed when M.equal expect observed -> ()
+  | observed ->
     Printf.printf
       "\nExpect  :%s\nObserved:%s\n"
       ([%show: M.t] expect)
       ([%show: M.t] observed)
-  | Error err ->
-    Printf.printf "\nDecode failed: %s \n" (Ocaml_protoc_plugin.Result.show_error err)
 ;;

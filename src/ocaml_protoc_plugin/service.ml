@@ -1,7 +1,7 @@
 module type Message = sig
   type t
 
-  val from_proto : Reader.t -> t Result.t
+  val from_proto : Reader.t -> t
   val to_proto : t -> Writer.t
 end
 

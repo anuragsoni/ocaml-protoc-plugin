@@ -18,9 +18,7 @@ let%expect_test "Default read default values" =
   let module T = Proto2.A in
   let () =
     match T.from_proto (Ocaml_protoc_plugin.Reader.create "") with
-    | Ok t -> print_endline (T.show t)
-    | Error e ->
-      Printf.printf "Decode failure: %s\n" (Ocaml_protoc_plugin.Result.show_error e)
+    | t -> print_endline (T.show t)
   in
   ();
   [%expect {| 4 |}]
@@ -30,9 +28,9 @@ let%expect_test "Required fields must be in the message" =
   let module T = Proto2.Message1 in
   let () =
     match T.from_proto (Ocaml_protoc_plugin.Reader.create "") with
-    | Ok t -> print_endline (T.show t)
-    | Error e ->
-      Printf.printf "Decode failure: %s\n" (Ocaml_protoc_plugin.Result.show_error e)
+    | t -> print_endline (T.show t)
+    | exception Ocaml_protoc_plugin.Runtime.Runtime'.Common.Required_field_missing ->
+      print_endline "Decode failure: `Required_field_missing"
   in
   ();
   [%expect {| Decode failure: `Required_field_missing |}]
@@ -47,9 +45,7 @@ let%expect_test "Only tramitting the required field" =
       T.from_proto
         (Ocaml_protoc_plugin.Writer.contents writer |> Ocaml_protoc_plugin.Reader.create)
     with
-    | Ok t -> print_endline (T.show t)
-    | Error e ->
-      Printf.printf "Decode failure: %s\n" (Ocaml_protoc_plugin.Result.show_error e)
+    | t -> print_endline (T.show t)
   in
   ();
   [%expect
@@ -67,9 +63,7 @@ let%expect_test "Default created messages should not set any fields" =
     (String.length (Ocaml_protoc_plugin.Writer.contents message));
   let () =
     match T.from_proto (Ocaml_protoc_plugin.Reader.create "") with
-    | Ok t -> print_endline (T.show t)
-    | Error e ->
-      Printf.printf "Decode failure: %s\n" (Ocaml_protoc_plugin.Result.show_error e)
+    | t -> print_endline (T.show t)
   in
   ();
   [%expect

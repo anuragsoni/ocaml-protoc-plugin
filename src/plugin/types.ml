@@ -136,7 +136,7 @@ let default_of_spec : type a. a spec -> string =
   | Bool -> string_of_default spec false
   | String -> string_of_default spec ""
   | Bytes -> string_of_default spec (Bytes.of_string "")
-  | Enum (_, s, _, _) -> sprintf {|(%s 0 |> Runtime'.Result.get ~msg:"Code gen error")|} s
+  | Enum (_, s, _, _) -> sprintf {|(%s 0)|} s
   | Message _ -> failwith "Messages defaults are not relevant"
 ;;
 

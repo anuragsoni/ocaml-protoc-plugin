@@ -4,12 +4,7 @@ let service reader =
   let s_deser, s_ser =
     Ocaml_protoc_plugin.Service.make_service_functions Service.String_of_int.call
   in
-  let req =
-    s_deser reader
-    |> function
-    | Ok v -> v
-    | Error _ -> failwith "Error"
-  in
+  let req = s_deser reader in
   string_of_int req |> s_ser
 ;;
 
@@ -26,9 +21,6 @@ let call i =
   |> Ocaml_protoc_plugin.Writer.contents
   |> Ocaml_protoc_plugin.Reader.create
   |> c_deser
-  |> function
-  | Ok r -> r
-  | Error _ -> failwith "Error"
 ;;
 
 let%expect_test _ =

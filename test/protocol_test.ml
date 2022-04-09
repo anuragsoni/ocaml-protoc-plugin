@@ -11,9 +11,8 @@ let%test "Last value kept" =
   let reader =
     Ocaml_protoc_plugin.Writer.contents writer |> Ocaml_protoc_plugin.Reader.create
   in
-  match Protocol.New.from_proto reader with
-  | Ok t -> Protocol.New.equal t expect
-  | Error _ -> false
+  let t = Protocol.New.from_proto reader in
+  Protocol.New.equal t expect
 ;;
 
 let%test "Last value kept - 2" =
@@ -29,9 +28,8 @@ let%test "Last value kept - 2" =
     ^ Ocaml_protoc_plugin.Writer.contents writer
     |> Ocaml_protoc_plugin.Reader.create
   in
-  match Protocol.New.from_proto reader with
-  | Ok t -> Protocol.New.equal t expect
-  | Error _ -> false
+  let t = Protocol.New.from_proto reader in
+  Protocol.New.equal t expect
 ;;
 
 let%test "Repeated fields kept as it should" =
@@ -47,7 +45,6 @@ let%test "Repeated fields kept as it should" =
     ^ Ocaml_protoc_plugin.Writer.contents writer2
     |> Ocaml_protoc_plugin.Reader.create
   in
-  match Protocol.List.from_proto reader with
-  | Ok t -> Protocol.List.equal t expect
-  | Error _ -> false
+  let t = Protocol.List.from_proto reader in
+  Protocol.List.equal t expect
 ;;

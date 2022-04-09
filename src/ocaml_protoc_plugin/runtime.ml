@@ -1,5 +1,6 @@
 module Runtime' = struct
   module Serialize = Serialize
+  module Common = Common
   module Deserialize = Deserialize
   module Spec = Spec
   module Result = Result
