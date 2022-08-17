@@ -11,24 +11,22 @@ type field_list =
   | Cons_field of (Field.t * field_list)
   | Cons_fields of (field_list * field_list)
 
-type t = {
-  mutable fields : field_list;
-  mutable size: int;
-}
+type t =
+  { mutable fields : field_list
+  ; mutable size : int
+  }
 
 (** Yes. But it would be nicer to just iter over them *)
 let rev_fields fields =
   let rec inner acc = function
     | Nil -> acc
-    | Cons_field (hd, tl) ->
-      inner (hd :: acc) tl
-    | Cons_fields (hd, tl) ->
-      inner (inner acc hd) tl
+    | Cons_field (hd, tl) -> inner (hd :: acc) tl
+    | Cons_fields (hd, tl) -> inner (inner acc hd) tl
   in
   inner [] fields
+;;
 
-let init () = {fields = Nil; size = 0;}
-
+let init () = { fields = Nil; size = 0 }
 
 let rec size_of_field = function
   | Varint v when v > 0L ->
@@ -38,44 +36,50 @@ let rec size_of_field = function
   | Varint _ -> 1
   | Fixed_32_bit _ -> 4
   | Fixed_64_bit _ -> 8
-  | Length_delimited {length; _} -> size_of_field (Varint (Int64.of_int length)) + length
-
+  | Length_delimited { length; _ } ->
+    size_of_field (Varint (Int64.of_int length)) + length
+;;
 
 let size t = t.size
 
 let write_varint buffer ~offset v =
   let rec inner ~offset v : int =
-    let (++) = (+) in
+    let ( ++ ) = ( + ) in
     let open Infix.Int64 in
     match v land 0x7FL, v lsr 7 with
     | v, 0L ->
       Bytes.set buffer offset (v |> Int64.to_int |> Char.chr);
-      (offset ++ 1)
+      offset ++ 1
     | v, rem ->
       Bytes.set buffer offset (v lor 0x80L |> Int64.to_int |> Char.chr);
       inner ~offset:(offset ++ 1) rem
   in
   inner ~offset v
+;;
 
 let write_fixed32 buffer ~offset v =
   LittleEndian.set_int32 buffer offset v;
   offset + 4
+;;
 
 let write_fixed64 buffer ~offset v =
   LittleEndian.set_int64 buffer offset v;
   offset + 8
+;;
 
 let write_length_delimited buffer ~offset ~src ~src_pos ~len =
   let offset = write_varint buffer ~offset (Int64.of_int len) in
   Bytes.blit ~src:(Bytes.of_string src) ~src_pos ~dst:buffer ~dst_pos:offset ~len;
   offset + len
+;;
 
 let write_field buffer ~offset = function
   | Varint v -> write_varint buffer ~offset v
   | Fixed_32_bit v -> write_fixed32 buffer ~offset v
   | Fixed_64_bit v -> write_fixed64 buffer ~offset v
-  | Length_delimited {offset = src_pos; length; data} ->
+  | Length_delimited { offset = src_pos; length; data } ->
     write_length_delimited buffer ~offset ~src:data ~src_pos ~len:length
+;;
 
 let contents t =
   let size = size t in
@@ -86,22 +90,26 @@ let contents t =
   in
   assert (next_offset = size);
   Bytes.to_string buffer
+;;
 
 let add_field t field =
-  t.fields <- Cons_field(field, t.fields);
+  t.fields <- Cons_field (field, t.fields);
   t.size <- t.size + size_of_field field;
   ()
+;;
 
 (** Add the contents of src as is *)
 let concat t ~src =
-  t.fields <- Cons_fields(src.fields, t.fields);
+  t.fields <- Cons_fields (src.fields, t.fields);
   t.size <- t.size + src.size;
   ()
+;;
 
 let write_field_header : t -> int -> int -> unit =
-  fun t index field_type ->
+ fun t index field_type ->
   let header = (index lsl 3) + field_type in
   add_field t (Varint (Int64.of_int header))
+;;
 
 let write_field : t -> int -> Field.t -> unit =
  fun t index field ->
@@ -114,6 +122,7 @@ let write_field : t -> int -> Field.t -> unit =
   in
   write_field_header t index field_type;
   add_field t field
+;;
 
 (** Add the contents of src as a length_delimited field *)
 let concat_as_length_delimited t ~src index =
@@ -121,28 +130,31 @@ let concat_as_length_delimited t ~src index =
   write_field_header t index 2;
   add_field t (Varint (Int64.of_int size));
   concat t ~src
+;;
 
 let dump t =
   let string_contents = contents t in
   List.init ~len:(String.length string_contents) ~f:(fun i ->
-    sprintf "%02x" (Char.code (String.get string_contents i))
-  )
+    sprintf "%02x" (Char.code (String.get string_contents i)))
   |> String.concat ~sep:"-"
   |> printf "Buffer: %s\n"
+;;
 
-let of_list: (int * Field.t) list -> t = fun fields ->
+let of_list : (int * Field.t) list -> t =
+ fun fields ->
   let t = init () in
   List.iter ~f:(fun (index, field) -> write_field t index field) fields;
   t
-
+;;
 
 module Test = struct
   let test () =
-    let (_:bool) =
+    let (_ : bool) =
       let buffer = init () in
       write_field buffer 1 (Varint 1L);
       let c = contents buffer in
-      String.length c = 2 && String.equal c "\x08\x01" || failwith "Writefield failed"
+      (String.length c = 2 && String.equal c "\x08\x01") || failwith "Writefield failed"
     in
     ()
+  ;;
 end

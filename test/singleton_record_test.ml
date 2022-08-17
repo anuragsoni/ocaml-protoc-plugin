@@ -6,6 +6,7 @@ let%expect_test _ =
   Test_lib.test_encode (module T) t;
   [%expect {|
     j: "Test" |}]
+;;
 
 let%expect_test _ =
   let module T = Singleton_record.Test2 in
@@ -13,6 +14,7 @@ let%expect_test _ =
   Test_lib.test_encode (module T) t;
   [%expect {|
     f3: "Test" |}]
+;;
 
 let%expect_test _ =
   let module T = Singleton_record.Test3 in
@@ -20,6 +22,7 @@ let%expect_test _ =
   Test_lib.test_encode (module T) t;
   [%expect {|
     x1: 7 |}]
+;;
 
 let%expect_test _ =
   let module T = Singleton_record.Test4 in
@@ -29,6 +32,7 @@ let%expect_test _ =
     t {
       j: "test"
     } |}]
+;;
 
 let%expect_test _ =
   let module T = Singleton_record.Test5 in
@@ -38,3 +42,4 @@ let%expect_test _ =
     m {
       enum: B
     } |}]
+;;
