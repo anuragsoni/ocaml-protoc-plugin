@@ -2,7 +2,7 @@ open Service
 
 let service reader =
   let s_deser, s_ser =
-    Ocaml_protoc_plugin.Service.make_service_functions Service.String_of_int.call
+    Ocaml_protoc_plugin.Service.make_service_functions Service.String_of_int.Call.service
   in
   let req = s_deser reader in
   string_of_int req |> s_ser
@@ -10,7 +10,7 @@ let service reader =
 
 let call i =
   let c_ser, c_deser =
-    Ocaml_protoc_plugin.Service.make_client_functions Service.String_of_int.call
+    Ocaml_protoc_plugin.Service.make_client_functions Service.String_of_int.Call.service
   in
   let req = i in
   req

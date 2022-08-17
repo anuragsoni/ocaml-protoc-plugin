@@ -77,7 +77,64 @@ let emit_enum_type
 ;;
 
 let emit_service_type scope ServiceDescriptorProto.{ name; method' = methods; _ } =
-  let emit_method t scope MethodDescriptorProto.{ name; input_type; output_type; _ } =
+  let emit_signature t scope MethodDescriptorProto.{ name; input_type; output_type; _ } =
+    let name = Option.value_exn ~message:"Service definitions must have a name" name in
+    Code.emit
+      t
+      `Begin
+      "module %s : sig"
+      (String.capitalize_ascii (Scope.get_name scope name));
+    Code.emit t `None "val name' : unit -> string";
+    Code.emit t `None "module Request = %s" (Scope.get_scoped_name scope input_type);
+    Code.emit t `None "module Response = %s" (Scope.get_scoped_name scope output_type);
+    Code.emit
+      t
+      `None
+      "val service : (module Runtime'.Service.Message with type t = %s) * (module \
+       Runtime'.Service.Message with type t = %s)"
+      (Scope.get_scoped_name ~postfix:"t" scope input_type)
+      (Scope.get_scoped_name ~postfix:"t" scope output_type);
+    Code.emit t `End "end"
+  in
+  let emit_struct t scope MethodDescriptorProto.{ name; input_type; output_type; _ } =
+    let name = Option.value_exn ~message:"Service definitions must have a name" name in
+    Code.emit
+      t
+      `Begin
+      "module %s = struct"
+      (String.capitalize_ascii (Scope.get_name scope name));
+    Code.emit t `None "let name' () = %S" (Scope.get_current_scope scope ^ "/" ^ name);
+    Code.emit t `None "module Request = %s" (Scope.get_scoped_name scope input_type);
+    Code.emit t `None "module Response = %s" (Scope.get_scoped_name scope output_type);
+    Code.emit t `Begin "let service = ";
+    Code.emit
+      t
+      `None
+      "( (module %s : Runtime'.Service.Message with type t = %s ), "
+      (Scope.get_scoped_name scope input_type)
+      (Scope.get_scoped_name ~postfix:"t" scope input_type);
+    Code.emit
+      t
+      `End
+      "  (module %s : Runtime'.Service.Message with type t = %s ) ) "
+      (Scope.get_scoped_name scope output_type)
+      (Scope.get_scoped_name ~postfix:"t" scope output_type);
+    Code.emit t `End "end"
+  in
+  let name = Option.value_exn ~message:"Service definitions must have a name" name in
+  let t = Code.init () in
+  Code.emit t `Begin "module %s : sig" (Scope.get_name scope name);
+  Code.emit t `None "val name' : unit -> string";
+  let scope = Scope.push scope name in
+  List.iter ~f:(emit_signature t scope) methods;
+  Code.emit t `None "end = struct";
+  Code.emit t `None "let name' () = %S" (Scope.get_current_scope scope);
+  List.iter ~f:(emit_struct t scope) methods;
+  Code.emit t `End "end";
+  t
+;;
+
+(*= let emit_method t scope MethodDescriptorProto.{ name; input_type; output_type; _ } =
     Code.emit t `Begin "let %s = " (Scope.get_name_exn scope name);
     Code.emit
       t
@@ -98,7 +155,7 @@ let emit_service_type scope ServiceDescriptorProto.{ name; method' = methods; _ 
   List.iter ~f:(emit_method t (Scope.push scope name)) methods;
   Code.emit t `End "end";
   t
-;;
+;; *)
 
 let emit_extension ~scope ~params field =
   let FieldDescriptorProto.{ name; extendee; _ } = field in

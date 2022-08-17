@@ -30,7 +30,7 @@ let mk_reply Echo.Request.{ timestamp; what } =
 
 let handle_request proto_request =
   let decode, encode =
-    Ocaml_protoc_plugin.Service.make_service_functions Echo.Echo.call
+    Ocaml_protoc_plugin.Service.make_service_functions Echo.Echo.Call.service
   in
   let request = Ocaml_protoc_plugin.Reader.create proto_request |> decode in
   Printf.printf "Got request: %s\n" ([%show: Echo.Request.t] request);
@@ -39,7 +39,9 @@ let handle_request proto_request =
 ;;
 
 let do_request ~handler request =
-  let encode, decode = Ocaml_protoc_plugin.Service.make_client_functions Echo.Echo.call in
+  let encode, decode =
+    Ocaml_protoc_plugin.Service.make_client_functions Echo.Echo.Call.service
+  in
   let proto_request = encode request |> Ocaml_protoc_plugin.Writer.contents in
   let proto_reply = handler proto_request in
   Ocaml_protoc_plugin.Reader.create proto_reply |> decode
