@@ -1,9 +1,11 @@
 open Map
+
 let%expect_test _ =
   let module T = Map.Test in
   let t = [ 1, "1"; 2, "2"; 3, "3" ] in
   Test_lib.test_encode (module T) t;
-  [%expect {|
+  [%expect
+    {|
     m {
       key: 1
       value: "1"
@@ -16,14 +18,14 @@ let%expect_test _ =
       key: 3
       value: "3"
     } |}]
-
+;;
 
 let%expect_test _ =
   let module T = Map.Two in
-  let t = T.{ m = [ 1, "1"; 2, "2"; 3, "3" ];
-              n = [ 1, 1.0; 2, 2.0; 3, 3.0 ]} in
+  let t = T.{ m = [ 1, "1"; 2, "2"; 3, "3" ]; n = [ 1, 1.0; 2, 2.0; 3, 3.0 ] } in
   Test_lib.test_encode (module T) t;
-  [%expect {|
+  [%expect
+    {|
     m {
       key: 1
       value: "1"
@@ -48,17 +50,14 @@ let%expect_test _ =
       key: 3
       value: 3
     } |}]
-
+;;
 
 let%expect_test _ =
   let module T = Map.Map_message in
-  let t = [ 1, Some 1;
-            2, Some 1;
-            3, Some 1;
-            4, Some 1; ]
-  in
+  let t = [ 1, Some 1; 2, Some 1; 3, Some 1; 4, Some 1 ] in
   Test_lib.test_encode (module T) t;
-  [%expect {|
+  [%expect
+    {|
     m {
       key: 1
       value {
@@ -83,3 +82,4 @@ let%expect_test _ =
         i: 1
       }
     } |}]
+;;

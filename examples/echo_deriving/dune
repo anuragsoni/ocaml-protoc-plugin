@@ -1,28 +1,28 @@
 ; This example shows how to use google wellknown type with derivers.
+
 (executable
- (name        test)
- (libraries   ocaml-protoc-plugin unix google_types_deriving)
+ (name test)
+ (libraries ocaml-protoc-plugin unix google_types_deriving)
  (preprocess
-  (pps ppx_expect ppx_deriving.show ppx_deriving.eq ppx_deriving.ord))
-)
+  (pps ppx_expect ppx_deriving.show ppx_deriving.eq ppx_deriving.ord)))
 
 (rule
  (targets google_include)
- (action (with-stdout-to %{targets}
-          (system "pkg-config protobuf --variable=includedir"))))
-
+ (action
+  (with-stdout-to
+   %{targets}
+   (system "pkg-config protobuf --variable=includedir"))))
 
 (rule
  (targets echo.ml)
  (deps
-  (:proto echo.proto) (package ocaml-protoc-plugin))
+  (:proto echo.proto)
+  (package ocaml-protoc-plugin))
  (action
   (run protoc -I %{read-lines:google_include} -I .
-       "--ocaml_out=open=Google_types_deriving;annot=[@@deriving show { with_path = false }, eq, ord]:."
-       %{proto}))
-)
+    "--ocaml_out=open=Google_types_deriving;annot=[@@deriving show { with_path = false }, eq, ord]:."
+    %{proto})))
 
 (alias
  (name runtest)
- (deps test.exe)
-)
+ (deps test.exe))
