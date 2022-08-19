@@ -82,8 +82,9 @@ let emit_service_type scope ServiceDescriptorProto.{ name; method' = methods; _ 
     Code.emit
       t
       `None
-      "module %s : Runtime'.Service.Rpc with type request = %s and type response = %s"
-      (String.capitalize_ascii (Scope.get_name scope name))
+      "val %s : (module Runtime'.Service.Rpc with type request = %s and type response = \
+       %s)"
+      (String.lowercase_ascii (Scope.get_name scope name))
       (Scope.get_scoped_name ~postfix:"t" scope input_type)
       (Scope.get_scoped_name ~postfix:"t" scope output_type)
   in
@@ -114,7 +115,16 @@ let emit_service_type scope ServiceDescriptorProto.{ name; method' = methods; _ 
       (Scope.get_scoped_name ~postfix:"t" scope output_type);
     Code.emit t `None "module Request = %s" (Scope.get_scoped_name scope input_type);
     Code.emit t `None "module Response = %s" (Scope.get_scoped_name scope output_type);
-    Code.emit t `End "end"
+    Code.emit t `End "end";
+    Code.emit
+      t
+      `None
+      "let %s = (module %s : Runtime'.Service.Rpc with type request = %s and type \
+       response = %s)"
+      (String.lowercase_ascii (Scope.get_name scope name))
+      (String.capitalize_ascii (Scope.get_name scope name))
+      (Scope.get_scoped_name ~postfix:"t" scope input_type)
+      (Scope.get_scoped_name ~postfix:"t" scope output_type)
   in
   let name = Option.value_exn ~message:"Service definitions must have a name" name in
   let t = Code.init () in
